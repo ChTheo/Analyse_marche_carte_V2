@@ -1,0 +1,7 @@
+requests
+pandas
+selenium
+jupyter
+webdriver-manager
+beautifulsoup4
+redis<5.0
