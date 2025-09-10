@@ -2,8 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches:     
-      - main
+    branches:
+      
+main
 pull_request:
 
 jobs:
@@ -30,7 +31,7 @@ name: Install dependencies
         pip install -r requirements.txt
         pip install pytest
 
-      # 4. Créer le fichier .env avec les variable defini dans github secrets
+      # 4. Créer le fichier .env avec les secrets
       
 name: Create .env file
       run: |
@@ -45,7 +46,7 @@ name: Create .env file
 name: Run unit tests
       run: pytest -v tests/test_manage_data.py tests/test_scryfall_api.py
 
-      # 6. Se connecter à Docker
+      # 6. Se connecter à DockerHub
       
 name: Log in to DockerHub
       uses: docker/login-action@v2
@@ -53,7 +54,7 @@ name: Log in to DockerHub
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_TOKEN }}
 
-      # 7. Build et push de l’image Docker
+      # 7. Construire et push l’image Docker
       
 name: Build and push Docker image
       uses: docker/build-push-action@v4
