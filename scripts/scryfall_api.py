@@ -4,6 +4,7 @@ import time
 
 url_fr= "https://api.scryfall.com/cards/search?q=lang:fr"
 url_en = "https://api.scryfall.com/cards/search?q=lang:en"
+url_pytest ="https://api.scryfall.com/cards/random"
 
 header = {
     "Accept": "application/json",
@@ -43,3 +44,10 @@ def get_all_cards_today():
     df = pd.json_normalize(all_cards)
     print(f"{len(df)} cartes importées.")
     return df
+
+def get_random_card():
+    random_card = []
+    url_test = url_pytest
+    response = r.get(url_test)
+    data_random = response.json()
+    return data_random
