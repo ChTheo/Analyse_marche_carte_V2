@@ -11,13 +11,10 @@ def create_chrome_driver():
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
     options.add_argument('--disable-gpu')
-    unique_dir = tempfile.mkdtemp(prefix="chrome_profile_")
-    options.add_argument(f'--user-data-dir={unique_dir}')
-    
-    driver = webdriver.Chrome(
-        service=Service(ChromeDriverManager().install()),  # pas besoin de version fixe si tu as installé Chrome stable compatible
-        options=options
-    )
+    options.add_argument('--no-sandbox')  # important dans Docker
+    options.add_argument('--disable-dev-shm-usage')  # éviter les erreurs mémoire
+    # Utilise directement le ChromeDriver installé
+    driver = webdriver.Chrome(service=Service('/usr/bin/chromedriver'), options=options)
     return driver
 
 def scrape_edhrec():
