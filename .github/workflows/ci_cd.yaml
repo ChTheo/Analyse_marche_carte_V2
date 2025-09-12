@@ -53,3 +53,19 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/monprojet:latest
+     # 8. Deployer sur la vm d'airflow
+      - name: Deploy to remote VM
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          port: ${{ secrets.VM_SSH_PORT }}
+          strict: false
+          script: |
+            cd /home/ubuntu/monprojet
+            git pull origin main
+            docker pull ${{ secrets.DOCKER_USERNAME }}/monprojet:latest
+            docker stop monprojet || true
+            docker rm monprojet || true
+            docker run -d --name monprojet -p 80:80 ${{ secrets.DOCKER_USERNAME }}/monprojet:latest
