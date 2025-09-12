@@ -59,7 +59,7 @@ jobs:
       - name: Deploy to remote VM
         uses: appleboy/ssh-action@v0.1.7
         with:
-          host: ${{ secrets.VM_HOST }}
+          host: ${{ secrets.VM_IP }}
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
           port: ${{ secrets.VM_SSH_PORT }}
