@@ -10,6 +10,7 @@ def scrape_edhrec():
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
     options.add_argument('--disable-gpu')
+    options.add_argument(f'--user-data-dir={tempfile.mkdtemp()}')
     driver = webdriver.Chrome(service=Service(ChromeDriverManager(driver_version="138").install()), options=options)
 
     driver.get(url)
@@ -37,6 +38,7 @@ def scrape_mtggoldfish():
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
     options.add_argument('--disable-gpu')
+    options.add_argument(f'--user-data-dir={tempfile.mkdtemp()}')  # <-- ajoute cette ligne
     driver = webdriver.Chrome(service=Service(ChromeDriverManager(driver_version="138").install()), options=options)
 
     card_rankings = {}
