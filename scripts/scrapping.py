@@ -5,17 +5,32 @@ from bs4 import BeautifulSoup
 from db import connect_database
 import tempfile
 import time
+import os
+
+def create_chrome_driver():
+    """Crée un driver Chrome headless sécurisé pour Docker."""
+    options = webdriver.ChromeOptions()
+    options.add_argument('--headless')
+    options.add_argument('--no-sandbox')  # indispensable en conteneur Docker
+    options.add_argument('--disable-dev-shm-usage')  # utile pour conteneurs limités en mémoire
+    options.add_argument('--disable-gpu')
+    
+    # Profil temporaire unique
+    temp_profile_dir = tempfile.mkdtemp()
+    options.add_argument(f'--user-data-dir={temp_profile_dir}')
+    
+    driver = webdriver.Chrome(
+        service=Service(ChromeDriverManager().install()),
+        options=options
+    )
+    return driver
 
 def scrape_edhrec():
     url = "https://edhrec.com/top/month"
-    options = webdriver.ChromeOptions()
-    options.add_argument('--headless')
-    options.add_argument('--disable-gpu')
-    options.add_argument(f'--user-data-dir={tempfile.mkdtemp()}')
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager(driver_version="138").install()), options=options)
+    driver = create_chrome_driver()
 
     driver.get(url)
-    time.sleep(5)
+    time.sleep(5)  # attendre le chargement complet
 
     html = driver.page_source
     soup = BeautifulSoup(html, 'html.parser')
@@ -36,12 +51,7 @@ def scrape_mtggoldfish():
         "vintage": "https://www.mtggoldfish.com/format-staples/vintage/full/all"
     }
 
-    options = webdriver.ChromeOptions()
-    options.add_argument('--headless')
-    options.add_argument('--disable-gpu')
-    options.add_argument(f'--user-data-dir={tempfile.mkdtemp()}')  # <-- ajoute cette ligne
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager(driver_version="138").install()), options=options)
-
+    driver = create_chrome_driver()
     card_rankings = {}
 
     for format_name, url in urls.items():
@@ -63,19 +73,19 @@ def scrape_mtggoldfish():
 def get_cards_popularity():
     conn, cur = connect_database()
 
-    cur.execute("SELECT id, name FROM info_cartes") # Récupération de tout les id et nom de cartes
-    id_map = {name.lower(): id_ for id_, name in cur.fetchall()} # Creation d'un dictionnaire ou chaque clé correspond a une carte
+    cur.execute("SELECT id, name FROM info_cartes")  # Récupération de tout les id et nom de cartes
+    id_map = {name.lower(): id_ for id_, name in cur.fetchall()}
 
-    edhrec_data = scrape_edhrec() #Fonction pour les données commander
-    goldfish_data = scrape_mtggoldfish() # Fonction pour les autres formats
+    edhrec_data = scrape_edhrec()  # Fonction pour les données commander
+    goldfish_data = scrape_mtggoldfish()  # Fonction pour les autres formats
 
-    all_card_names = set(edhrec_data.keys()) | set(goldfish_data.keys()) # Les deux sources de données sont combinées en un ensemble unique
+    all_card_names = set(edhrec_data.keys()) | set(goldfish_data.keys())
 
-    result = [] #Initialisation d'une liste vide pour les resultats
+    result = []
     for name in sorted(all_card_names):
-        carte_id = id_map.get(name.lower())  # Récupération de l'id correspondant au nom de la carte
+        carte_id = id_map.get(name.lower())
         if carte_id is None:
-            continue  # On ignore les cartes absentes de info_cartes
+            continue
 
         entry = [
             carte_id,
@@ -88,12 +98,11 @@ def get_cards_popularity():
         ]
         result.append(entry)
 
-    # 2. Insertion
     query_reset = "DELETE FROM popularity"
     query_popularity = """
         INSERT INTO popularity (
-            id,name, commander, pauper, standard, modern, vintage)
-        VALUES (%s, %s, %s, %s, %s, %s,%s)
+            id, name, commander, pauper, standard, modern, vintage
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s)
     """
 
     cur.execute(query_reset)
