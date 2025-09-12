@@ -11,4 +11,4 @@ def test_get_random_card_response_ok():
         # Vérifie que la réponse contient un champ attendu (ex: 'name')
         assert "name" in data, "La réponse ne contient pas de champ 'name'"
     except requests.exceptions.RequestException as e:
-        pytest.fail(f"L'appel API a échoué avec une erreur réseau : {e}")s
+        pytest.fail(f"L'appel API a échoué avec une erreur réseau : {e}")
