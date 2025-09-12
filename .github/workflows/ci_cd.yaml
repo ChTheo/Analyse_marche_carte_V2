@@ -38,7 +38,9 @@ jobs:
 
       # 5. Lancer les tests unitaires
       - name: Run unit tests
-        run: pytest -v tests/test_manage_data.py tests/test_scryfall_api.py
+        run: |
+          export PYTHONPATH=$PYTHONPATH:$(pwd)/scripts
+          pytest -v tests/test_manage_data.py tests/test_scryfall_api.py
 
       # 6. Se connecter à Docker
       - name: Log in to DockerHub
