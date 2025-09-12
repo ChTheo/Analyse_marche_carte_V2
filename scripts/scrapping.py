@@ -8,19 +8,13 @@ import time
 import os
 
 def create_chrome_driver():
-    """Crée un driver Chrome headless sécurisé pour Docker."""
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
-    options.add_argument('--no-sandbox')  # indispensable en conteneur Docker
-    options.add_argument('--disable-dev-shm-usage')  # utile pour conteneurs limités en mémoire
     options.add_argument('--disable-gpu')
-    
-    # Profil temporaire unique
-    temp_profile_dir = tempfile.mkdtemp()
-    options.add_argument(f'--user-data-dir={temp_profile_dir}')
+    options.add_argument(f'--user-data-dir={tempfile.mkdtemp()}')
     
     driver = webdriver.Chrome(
-        service=Service(ChromeDriverManager().install()),
+        service=Service(ChromeDriverManager(driver_version="140.0.7339.127").install()),
         options=options
     )
     return driver
