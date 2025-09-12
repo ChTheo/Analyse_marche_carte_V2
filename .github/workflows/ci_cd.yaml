@@ -42,21 +42,21 @@ jobs:
           export PYTHONPATH=$PYTHONPATH:$(pwd)/scripts
           pytest -v tests/test_manage_data.py tests/test_scryfall_api.py
 
-      # 6. Connexion à Dockerhub
+      # 6. Se connecter à Docker
       - name: Log in to DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      # 7. Build et push sur dockerhub
+      # 7. Construire et push l’image Docker
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/airflow-docker:latest
 
-      # 8. Déployer sur la VM de airflow
+      # 8. Déployer sur la VM Airflow
       - name: Deploy to remote VM
         uses: appleboy/ssh-action@v0.1.7
         with:
@@ -67,6 +67,6 @@ jobs:
           script: |
             cd /home/theochampeil/conteneur-m2/Analyse_marche_carte_V2/
             git pull origin main
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/airflow-docker:latest
-            sudo docker stop airflow-docker || true
-            sudo docker run -d --name airflow-docker -p 80:80 ${{ secrets.DOCKER_USERNAME }}/airflow-docker:latest
+            docker pull ${{ secrets.DOCKER_USERNAME }}/airflow-docker:latest
+            docker stop airflow-docker || true
+            docker run -d --name airflow-docker -p 80:80 ${{ secrets.DOCKER_USERNAME }}/airflow-docker:latest
