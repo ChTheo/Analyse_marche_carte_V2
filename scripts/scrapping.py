@@ -11,10 +11,11 @@ def create_chrome_driver():
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
     options.add_argument('--disable-gpu')
-    options.add_argument(f'--user-data-dir={tempfile.mkdtemp()}')
+    unique_dir = tempfile.mkdtemp(prefix="chrome_profile_")
+    options.add_argument(f'--user-data-dir={unique_dir}')
     
     driver = webdriver.Chrome(
-        service=Service(ChromeDriverManager(driver_version="140.0.7339.127").install()),
+        service=Service(ChromeDriverManager().install()),  # pas besoin de version fixe si tu as installé Chrome stable compatible
         options=options
     )
     return driver
