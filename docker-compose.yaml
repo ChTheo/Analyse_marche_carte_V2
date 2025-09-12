@@ -1,21 +1,6 @@
 version: '3.8'
 
 services:
-  timescaledb:
-    image: timescale/timescaledb:2.13.0-pg13
-    environment:
-      POSTGRES_USER: airflow
-      POSTGRES_PASSWORD: airflow
-      POSTGRES_DB: airflow
-    ports:
-      - "5433:5432"
-    volumes:
-      - timescale-db-volume:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "airflow"]
-      interval: 10s
-      retries: 5
-
   redis:
     image: redis:7.2-bookworm
     healthcheck:
@@ -27,7 +12,6 @@ services:
     build: .
     image: apache/airflow:2.9.1
     depends_on:
-      - timescaledb
       - redis
       - airflow-init
     environment:
@@ -35,8 +19,8 @@ services:
       AIRFLOW__CORE__FERNET_KEY: ''
       AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
       AIRFLOW__CORE__LOAD_EXAMPLES: 'true'
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@timescaledb/airflow
-      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@timescaledb/airflow
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@10.0.0.2:5432/analyse_cartes
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@10.0.0.2:5432/analyse_cartes
       AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
       _AIRFLOW_WWW_USER_CREATE: 'true'
       _AIRFLOW_WWW_USER_USERNAME: airflow
@@ -54,14 +38,13 @@ services:
     build: .
     image: apache/airflow:2.9.1
     depends_on:
-      - timescaledb
       - redis
       - airflow-init
     environment:
       AIRFLOW__CORE__EXECUTOR: CeleryExecutor
       AIRFLOW__CORE__FERNET_KEY: ''
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@timescaledb/airflow
-      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@timescaledb/airflow
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@10.0.0.2:5432/analyse_cartes
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@10.0.0.2:5432/analyse_cartes
       AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
     volumes:
       - ./dags:/opt/airflow/dags
@@ -74,14 +57,13 @@ services:
     build: .
     image: apache/airflow:2.9.1
     depends_on:
-      - timescaledb
       - redis
       - airflow-init
     environment:
       AIRFLOW__CORE__EXECUTOR: CeleryExecutor
       AIRFLOW__CORE__FERNET_KEY: ''
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@timescaledb/airflow
-      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@timescaledb/airflow
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@10.0.0.2:5432/analyse_cartes
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@10.0.0.2:5432/analyse_cartes
       AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
     volumes:
       - ./dags:/opt/airflow/dags
@@ -94,13 +76,12 @@ services:
     build: .
     image: apache/airflow:2.9.1
     depends_on:
-      - timescaledb
       - redis
     environment:
       AIRFLOW__CORE__EXECUTOR: CeleryExecutor
       AIRFLOW__CORE__FERNET_KEY: ''
-      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@timescaledb/airflow
-      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@timescaledb/airflow
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@10.0.0.2:5432/analyse_cartes
+      AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@10.0.0.2:5432/analyse_cartes
       AIRFLOW__CELERY__BROKER_URL: redis://redis:6379/0
       _AIRFLOW_DB_MIGRATE: 'true'
       _AIRFLOW_WWW_USER_CREATE: 'true'
@@ -114,6 +95,3 @@ services:
       - ./scripts:/opt/airflow/scripts
     entrypoint: bash
     command: -c "airflow db migrate && airflow users create -u airflow -p airflow -f admin -l user -r Admin -e admin@example.com"
-
-volumes:
-  timescale-db-volume:
