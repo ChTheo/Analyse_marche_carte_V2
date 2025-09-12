@@ -4,8 +4,8 @@ def connect_database():
     try:
         conn = psycopg2.connect(
             dbname="analyse_cartes",   
-            user="airflow",            
-            password="airflow",        
+            user="postgres",            
+            password="1",        
             host="10.0.0.2",           # IP de la bdd sur le vpn
             port="5432"                
         )
