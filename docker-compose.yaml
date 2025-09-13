@@ -30,7 +30,7 @@ services:
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
       - ./scripts:/opt/airflow/scripts
-      - airflow_backups:/opt/airflow/backups
+      - ./backups:/opt/airflow/backups
     ports:
       - "8085:8080"
     command: webserver
@@ -52,7 +52,7 @@ services:
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
       - ./scripts:/opt/airflow/scripts
-      - airflow_backups:/opt/airflow/backups
+      - ./backups:/opt/airflow/backups
     command: scheduler
 
   airflow-worker:
@@ -72,7 +72,7 @@ services:
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
       - ./scripts:/opt/airflow/scripts
-      - airflow_backups:/opt/airflow/backups
+      - ./backups:/opt/airflow/backups
     command: celery worker
 
   airflow-init:
@@ -96,9 +96,6 @@ services:
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
       - ./scripts:/opt/airflow/scripts
-      - airflow_backups:/opt/airflow/backups
+      - ./backups:/opt/airflow/backups
     entrypoint: bash
     command: -c "airflow db migrate && airflow users create -u airflow -p airflow -f admin -l user -r Admin -e admin@example.com"
-
-volumes:
-  airflow_backups:
