@@ -3,7 +3,7 @@ FROM apache/airflow:2.9.1
 
 # Passe en utilisateur root pour installer des paquets
 USER root
-
+RUN mkdir -p /opt/airflow/backups && chmod -R 777 /opt/airflow/backups
 # Installer Chromium version fixe et unzip pour webdriver-manager
 RUN apt-get update && apt-get install -y \
     wget \
