@@ -14,7 +14,9 @@ with DAG(
         task_id="run_postgres_backup",
         bash_command="""
         mkdir -p /opt/airflow/backups &&
-        pg_dump -U postgres -h 10.0.0.2 analyse_cartes > /opt/airflow/backups/backup_$(date +%Y%m%d_%H%M%S).sql
+        FILE=/opt/airflow/backups/backup_$(date +%Y%m%d_%H%M%S).sql &&
+        pg_dump -U postgres -h 10.0.0.2 analyse_cartes > $FILE &&
+        echo "Backup created: $FILE"
         """,
         env={"PGPASSWORD": "1"}  #
     )
