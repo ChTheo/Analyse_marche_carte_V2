@@ -14,7 +14,7 @@ def create_chrome_driver():
     options.add_argument('--no-sandbox')  # important dans Docker
     options.add_argument('--disable-dev-shm-usage')  # éviter les erreurs mémoire
     # Utilise directement le ChromeDriver installé
-    driver = webdriver.Chrome(service=Service('/usr/bin/chromedriver'), options=options)
+    driver = service=Service(ChromeDriverManager(driver_version="140.0.7339.127").install()),
     return driver
 
 def scrape_edhrec():
